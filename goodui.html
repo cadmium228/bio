@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="purple">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECLIPSE | Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #000000;
+            --win-bg: rgba(18, 18, 22, 0.75);
+            --win-border: rgba(255, 255, 255, 0.08);
+            --sidebar-bg: rgba(255, 255, 255, 0.02);
+            --card-bg: rgba(30, 30, 35, 0.5);
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --input-bg: #141416;
+            --success: #10b981;
+            
+            --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+            --blur: blur(24px) saturate(140%);
+            
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.5);
+        }
+
+        [data-theme="red"] { --accent: #ef4444; --accent-glow: rgba(239, 68, 68, 0.5); }
+        [data-theme="green"] { --accent: #10b981; --accent-glow: rgba(16, 185, 129, 0.5); }
+        [data-theme="blue"] { --accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.5); }
+        [data-theme="orange"] { --accent: #f97316; --accent-glow: rgba(249, 115, 22, 0.5); }
+        [data-theme="cyan"] { --accent: #06b6d4; --accent-glow: rgba(6, 182, 212, 0.5); }
+        [data-theme="pink"] { --accent: #ec4899; --accent-glow: rgba(236, 72, 153, 0.5); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; user-select: none; outline: none; }
+        
+        body {
+            background-color: var(--bg-body);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .liquid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10;
+            background: 
+                radial-gradient(circle at 15% 55%, var(--accent-glow) 0%, transparent 40%),
+                radial-gradient(circle at 85% 25%, var(--accent-glow) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(20, 20, 30, 1) 0%, transparent 80%);
+            opacity: 0.5;
+            filter: blur(50px);
+            animation: flow 12s infinite alternate ease-in-out;
+            transition: background 0.5s var(--ease);
+        }
+
+        @keyframes flow {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .icon { width: 18px; height: 18px; fill: currentColor; display: block; }
+        .hidden { display: none !important; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .draggable-hud {
+            position: absolute;
+            background: rgba(12, 12, 14, 0.6);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            cursor: grab;
+            z-index: 10;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: border-color 0.2s, transform 0.1s;
+        }
+        .draggable-hud:active { cursor: grabbing; border-color: var(--accent); transform: scale(0.98); }
+
+        #watermark {
+            top: 20px; left: 20px;
+            padding: 8px 16px;
+            display: flex; gap: 14px; align-items: center;
+            font-size: 13px; font-weight: 600;
+            border-top: 2px solid var(--accent);
+        }
+        .sep { width: 1px; height: 14px; background: rgba(255,255,255,0.15); }
+
+        #array-list {
+            top: 20px; right: 20px;
+            background: transparent; border: none; backdrop-filter: none; box-shadow: none;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+        }
+        .module-item {
+            padding: 4px 12px;
+            background: rgba(15, 15, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid var(--accent);
+            border-radius: 4px 0 0 4px;
+            font-size: 13px; font-weight: 500;
+            text-shadow: 0 0 10px var(--accent-glow);
+            animation: slideIn 0.3s var(--ease);
+            box-shadow: -4px 4px 15px rgba(0,0,0,0.2);
+        }
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        #hotkeys-hud { top: 120px; left: 20px; width: 160px; }
+        .hud-header {
+            padding: 8px; font-size: 12px; font-weight: 600; color: #fff;
+            background: rgba(255,255,255,0.03); text-align: center; border-bottom: 1px solid var(--win-border);
+        }
+        .hud-content { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .hud-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+        .hud-row span:first-child { color: #fff; }
+
+        #staff-list { top: 40%; left: 20px; width: 180px; }
+
+        #target-hud {
+            top: 60%; left: 55%; transform: translate(-50%, -50%);
+            padding: 10px; display: flex; gap: 12px; align-items: center;
+            min-width: 220px; background: rgba(18, 18, 22, 0.85);
+        }
+        .th-face {
+            width: 44px; height: 44px; border-radius: 6px;
+            background: #2a2a2a; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .th-face img { width: 100%; height: 100%; object-fit: cover; }
+        .th-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+        .th-data { display: flex; justify-content: space-between; align-items: baseline; }
+        .th-name { font-size: 14px; font-weight: 600; color: #fff; }
+        .hp-val { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .hp-bar { width: 100%; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; }
+        .hp-fill { height: 100%; width: 65%; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); transition: width 0.3s; }
+
+        #app {
+            width: 920px; height: 620px;
+            background: var(--win-bg);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--win-border);
+            border-radius: 16px;
+            box-shadow: 0 50px 120px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex; flex-direction: column;
+            position: absolute; overflow: hidden;
+            z-index: 100; left: 100px; top: 100px;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #app.hidden-gui { opacity: 0; pointer-events: none; transform: scale(0.92); }
+
+        .title-bar {
+            height: 54px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 24px; border-bottom: 1px solid var(--win-border); flex-shrink: 0;
+        }
+        .drag-zone { flex: 1; height: 100%; display: flex; align-items: center; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fff; }
+        
+        /* FIXED BUTTON ALIGNMENT */
+        .controls { display: flex; gap: 10px; align-items: center; height: 100%; }
+        .win-btn {
+            width: 30px; height: 30px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s;
+            line-height: 0; /* Prevents text alignment issues */
+        }
+        .win-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .win-btn.close:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        #auth-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 8, 10, 0.9); z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s;
+        }
+        .auth-box { width: 320px; text-align: center; }
+        .input-box { position: relative; margin-bottom: 12px; }
+        .input-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; }
+        
+        input {
+            width: 100%; background: var(--input-bg);
+            border: 1px solid var(--win-border); border-radius: 8px;
+            padding: 12px 12px 12px 42px; font-size: 13px; color: #fff;
+            transition: 0.2s;
+        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        .btn-primary {
+            width: 100%; padding: 12px; background: var(--accent);
+            border: none; border-radius: 8px; font-weight: 600; color: #fff;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        #main-ui { flex: 1; display: flex; overflow: hidden; position: relative; }
+        
+        .sidebar {
+            width: 220px; background: var(--sidebar-bg);
+            border-right: 1px solid var(--win-border);
+            padding: 24px 12px; display: flex; flex-direction: column; gap: 6px;
+            overflow-y: auto; flex-shrink: 0;
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; padding: 0 12px; margin-bottom: 30px; }
+        .logo svg { width: 32px; height: 32px; fill: var(--accent); filter: drop-shadow(0 0 12px var(--accent-glow)); }
+        .logo span { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+
+        .tab-btn {
+            padding: 12px 16px; border-radius: 8px;
+            cursor: pointer; display: flex; align-items: center; gap: 14px;
+            font-size: 13px; color: var(--text-muted); transition: 0.2s;
+            border: 1px solid transparent; font-weight: 500; flex-shrink: 0;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.04); color: #fff; }
+        .tab-btn.active { 
+            background: linear-gradient(90deg, rgba(255,255,255,0.06), transparent); 
+            color: #fff; border-left: 3px solid var(--accent);
+        }
+        .tab-btn.active svg { color: var(--accent); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        
+        .content-area { flex: 1; padding: 32px; overflow-y: auto; position: relative; }
+        .page { display: none; animation: fade 0.3s var(--ease); }
+        .page.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 22px; font-weight: 600; margin-bottom: 24px; color: #fff; }
+        
+        .card-container { display: flex; flex-direction: column; gap: 12px; }
+
+        .card {
+            background: var(--card-bg); border: 1px solid var(--win-border);
+            border-radius: 10px; padding: 16px 20px;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            transition: 0.2s; position: relative;
+        }
+        .card:hover { border-color: rgba(255,255,255,0.15); }
+        
+        .label-wrap { display: flex; flex-direction: column; }
+        .label-title { font-size: 14px; font-weight: 500; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .label-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .bind-badge { 
+            font-size: 10px; background: rgba(255,255,255,0.1); 
+            padding: 2px 6px; border-radius: 4px; color: var(--accent);
+            opacity: 0; transition: 0.2s;
+        }
+        .card:hover .bind-badge { opacity: 1; }
+
+        .toggle {
+            width: 44px; height: 24px; background: rgba(0,0,0,0.4);
+            border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s;
+            border: 1px solid var(--win-border);
+        }
+        .toggle::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 16px; height: 16px; background: #666; border-radius: 50%;
+            transition: 0.3s var(--ease);
+        }
+        .toggle.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        .toggle.active::after { transform: translateX(18px); background: #fff; }
+
+        .expand-btn {
+            width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--win-border); color: #fff;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.3s; margin-left: 12px;
+        }
+        .expand-btn:hover { background: rgba(255,255,255,0.1); }
+        .expand-btn svg { width: 14px; height: 14px; transition: 0.3s; fill: #fff; }
+        .expand-btn.open svg { transform: rotate(180deg); }
+
+        .collapsible {
+            width: 100%; overflow: hidden; max-height: 0; transition: max-height 0.4s var(--ease);
+            border-top: 1px solid transparent; margin-top: 0;
+        }
+        .collapsible.open { 
+            max-height: 300px; margin-top: 12px; padding-top: 12px; 
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .cb-wrapper { display: flex; align-items: center; cursor: pointer; gap: 10px; }
+        .cb-box {
+            width: 18px; height: 18px; border: 1px solid var(--win-border);
+            border-radius: 4px; background: rgba(0,0,0,0.3);
+            transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .cb-wrapper input { display: none; }
+        .cb-wrapper input:checked + .cb-box { background: var(--accent); border-color: var(--accent); }
+        .cb-wrapper input:checked + .cb-box::after {
+            content: ''; width: 4px; height: 8px; border: solid white;
+            border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px);
+        }
+        .cb-label { font-size: 12px; color: var(--text-muted); }
+        .cb-wrapper:hover .cb-label { color: #fff; }
+
+        .slider-wrap { padding: 5px 0; }
+        .range-track {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; position: relative; cursor: pointer;
+        }
+        .range-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 50%; box-shadow: 0 0 10px var(--accent-glow); }
+        .range-thumb {
+            width: 12px; height: 12px; background: #fff; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer;
+        }
+        .slider-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+
+        .theme-selector { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .theme-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid var(--win-border); cursor: pointer;
+            transition: 0.3s; position: relative;
+        }
+        .theme-btn:hover { transform: scale(1.1); }
+        .theme-btn.active { border-color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+        
+        .t-purple { background: #8b5cf6; } .t-red { background: #ef4444; } .t-green { background: #10b981; }
+        .t-blue { background: #3b82f6; } .t-orange { background: #f97316; } .t-cyan { background: #06b6d4; } .t-pink { background: #ec4899; }
+
+        .btn-load {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--win-border);
+            padding: 6px 16px; border-radius: 6px; color: #fff; font-size: 12px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-load:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        .example-2 { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
+        .example-2 .icon-content a {
+            position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            width: 44px; height: 44px; border-radius: 12px; color: var(--text-muted); 
+            background-color: var(--input-bg); border: 1px solid var(--win-border); transition: 0.3s;
+        }
+        .example-2 .icon-content a:hover { border-color: var(--accent); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+        .example-2 .icon-content a svg { width: 20px; height: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="liquid-bg"></div>
+
+    <div id="watermark" class="draggable-hud">
+        <span style="color: var(--accent);">ECLIPSE</span>
+        <span>BETA</span>
+        <div class="sep"></div>
+        <span id="fps">144 FPS</span>
+        <div class="sep"></div>
+        <span id="bps">0.0 BPS</span>
+        <div class="sep"></div>
+        <span id="ping">24 ms</span>
+    </div>
+
+    <div id="array-list" class="draggable-hud" style="border:none; background:none; box-shadow:none;"></div>
+
+    <div id="hotkeys-hud" class="draggable-hud">
+        <div class="hud-header">Keybinds</div>
+        <div class="hud-content" id="hotkeys-container"></div>
+    </div>
+
+    <div id="staff-list" class="draggable-hud">
+        <div class="hud-header">Staff Online</div>
+        <div class="hud-content">
+            <div class="hud-row"><span style="color: #ef4444;">Admin</span><span>Hypixel</span></div>
+            <div class="hud-row"><span style="color: #3b82f6;">Helper</span><span>Steve</span></div>
+        </div>
+    </div>
+
+    <div id="target-hud" class="draggable-hud">
+        <div class="th-face">
+            <img src="https://minotar.net/avatar/Steve/64" alt="Face">
+        </div>
+        <div class="th-info">
+            <div class="th-data">
+                <span class="th-name">TargetEntity</span>
+                <span class="hp-val">12.5</span>
+            </div>
+            <div class="hp-bar"><div class="hp-fill"></div></div>
+        </div>
+    </div>
+
+    <div id="app">
+        <div id="auth-overlay">
+            <div class="auth-box">
+                <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+                    <svg style="width: 50px; height: 50px;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
+                </div>
+                <div class="input-box">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <input type="text" placeholder="Username">
+                </div>
+                <div class="input-box">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3 3.1-3 1.71 0 3.1 1.29 3.1 3v2z"/></svg>
+                    <input type="password" placeholder="Password">
+                </div>
+                <button class="btn-primary" onclick="login()">LOGIN</button>
+            </div>
+        </div>
+
+        <div class="title-bar" id="drag-handle">
+            <div class="drag-zone">ECLIPSE</div>
+            <div class="controls">
+                <div class="win-btn" onclick="app.style.opacity='0';setTimeout(()=>app.style.opacity='1',1000)"><svg class="icon" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg></div>
+                <div class="win-btn close" onclick="app.classList.add('hidden-gui')"><svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+            </div>
+        </div>
+
+        <div id="main-ui">
+            <div class="sidebar">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
+                    <span>ECLIPSE</span>
+                </div>
+
+                <div class="tab-btn active" onclick="tab('combat', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l-4 4 4 4v-3h7v6h-3l4 4 4-4h-3v-8h-9z"/></svg> Combat</div>
+                <div class="tab-btn" onclick="tab('visuals', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> Visuals</div>
+                <div class="tab-btn" onclick="tab('movement', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg> Movement</div>
+                <div class="tab-btn" onclick="tab('player', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Player</div>
+                <div class="tab-btn" onclick="tab('exploits', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg> Exploits</div>
+                <div class="tab-btn" onclick="tab('players', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Players</div>
+                <div class="tab-btn" onclick="tab('scripts', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg> Scripts</div>
+                
+                <div style="margin-top:auto"></div>
+                <div class="tab-btn" onclick="tab('settings', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> Settings</div>
+            </div>
+            
+            <div class="content-area">
+                
+                <div id="combat" class="page active">
+                    <h2>Combat</h2>
+                    <div class="card-container">
+                        <div class="card" id="mod-killaura">
+                            <div class="label-wrap">
+                                <span class="label-title">Kill Aura <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Automatically attacks entities</span>
+                            </div>
+                            <div class="toggle" onclick="toggleModule('Kill Aura', this)"></div>
+                        </div>
+                        <div class="card" id="mod-velocity">
+                            <div class="label-wrap">
+                                <span class="label-title">Velocity <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Reduce knockback</span>
+                            </div>
+                            <div class="toggle" onclick="toggleModule('Velocity', this)"></div>
+                        </div>
+                        <div class="card" id="mod-crit">
+                            <div class="label-wrap">
+                                <span class="label-title">Criticals <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Force critical hits</span>
+                            </div>
+                            <div class="toggle" onclick="toggleModule('Criticals', this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="visuals" class="page">
+                    <h2>Visuals</h2>
+                    <div class="card-container">
+                        <div class="card" id="mod-esp">
+                            <div class="label-wrap">
+                                <span class="label-title">ESP Master <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">See through walls</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="toggle" onclick="toggleModule('ESP', this)"></div>
+                                <div class="expand-btn" onclick="toggleCollapse(this)">
+                                    <svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapsible">
+                            <div class="settings-grid">
+                                <label class="cb-wrapper"><input type="checkbox" checked><div class="cb-box"></div><span class="cb-label">2D Box</span></label>
+                                <label class="cb-wrapper"><input type="checkbox" checked><div class="cb-box"></div><span class="cb-label">Health Bar</span></label>
+                                <label class="cb-wrapper"><input type="checkbox"><div class="cb-box"></div><span class="cb-label">Nametags</span></label>
+                                <label class="cb-wrapper"><input type="checkbox"><div class="cb-box"></div><span class="cb-label">Skeleton</span></label>
+                            </div>
+                        </div>
+
+                        <div class="card" id="mod-fullbright">
+                            <div class="label-wrap">
+                                <span class="label-title">Fullbright <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Max gamma</span>
+                            </div>
+                            <div class="toggle" onclick="toggleModule('Fullbright', this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="movement" class="page">
+                    <h2>Movement</h2>
+                    <div class="card-container">
+                        <div class="card" id="mod-speed">
+                            <div class="label-wrap">
+                                <span class="label-title">Speed <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Go fast</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="toggle" onclick="toggleModule('Speed', this)"></div>
+                                <div class="expand-btn" onclick="toggleCollapse(this)">
+                                    <svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapsible">
+                            <div class="slider-wrap" onmousedown="startSlide(event, this, 'sp-val')">
+                                <div class="slider-info"><span>Speed Factor</span><span id="sp-val">1.5</span></div>
+                                <div class="range-track"><div class="range-fill" style="width:30%"></div><div class="range-thumb" style="left:30%"></div></div>
+                            </div>
+                        </div>
+                        <div class="card" id="mod-fly">
+                            <div class="label-wrap">
+                                <span class="label-title">Flight <span class="bind-badge hidden">...</span></span>
+                                <span class="label-desc">Fly like creative</span>
+                            </div>
+                            <div class="toggle" onclick="toggleModule('Flight', this)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="player" class="page"><h2>Player</h2><div class="card-container"><div class="card"><div class="label-wrap"><span class="label-title">NoFall</span></div><div class="toggle" onclick="toggleModule('NoFall', this)"></div></div><div class="card"><div class="label-wrap"><span class="label-title">AutoArmor</span></div><div class="toggle" onclick="toggleModule('AutoArmor', this)"></div></div></div></div>
+                <div id="exploits" class="page"><h2>Exploits</h2><div class="card-container"><div class="card"><div class="label-wrap"><span class="label-title">Disabler</span></div><div class="toggle" onclick="toggleModule('Disabler', this)"></div></div><div class="card"><div class="label-wrap"><span class="label-title">Timer</span></div><div class="toggle" onclick="toggleModule('Timer', this)"></div></div></div></div>
+                <div id="players" class="page"><h2>Player List</h2><div class="card" style="height:300px; align-items:flex-start; overflow:auto;"><div style="width:100%; color:var(--text-muted); text-align:center; padding-top:20px;">No players in range</div></div></div>
+                <div id="scripts" class="page"><h2>Scripts</h2><div class="card" style="height:200px; justify-content:center; color:var(--text-muted); border-style:dashed;">Drag & Drop .lua files</div></div>
+
+                <div id="settings" class="page">
+                    <h2>Settings</h2>
+                    <div class="card" style="flex-wrap: wrap; gap: 15px; justify-content: flex-start;">
+                        <div class="theme-btn t-purple active" onclick="setTheme('purple', this)"></div>
+                        <div class="theme-btn t-red" onclick="setTheme('red', this)"></div>
+                        <div class="theme-btn t-green" onclick="setTheme('green', this)"></div>
+                        <div class="theme-btn t-blue" onclick="setTheme('blue', this)"></div>
+                        <div class="theme-btn t-orange" onclick="setTheme('orange', this)"></div>
+                        <div class="theme-btn t-cyan" onclick="setTheme('cyan', this)"></div>
+                        <div class="theme-btn t-pink" onclick="setTheme('pink', this)"></div>
+                    </div>
+                    
+                    <h2 style="font-size: 18px; margin-top: 30px;">Configs</h2>
+                    <div class="card-container">
+                        <div class="card"><div class="label-wrap"><span class="label-title">Hypixel Rise</span><span class="label-desc">Updated 2h ago</span></div><button class="btn-load" onclick="loadConfig(this)">Load</button></div>
+                        <div class="card"><div class="label-wrap"><span class="label-title">BlocksMC Hvh</span><span class="label-desc">Updated 1d ago</span></div><button class="btn-load" onclick="loadConfig(this)">Load</button></div>
+                        <div class="card"><div class="label-wrap"><span class="label-title">Legit Minigames</span><span class="label-desc">Updated 5h ago</span></div><button class="btn-load" onclick="loadConfig(this)">Load</button></div>
+                        <div class="card"><div class="label-wrap"><span class="label-title">Vanilla Bypasses</span><span class="label-desc">Updated 1w ago</span></div><button class="btn-load" onclick="loadConfig(this)">Load</button></div>
+                    </div>
+
+                    <h2 style="font-size: 18px; margin-top: 30px;">Socials</h2>
+                    <ul class="example-2">
+                        <li class="icon-content">
+                            <a href="#"><svg viewBox="0 0 16 16" fill="currentColor" height="16" width="16"><path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"></path></svg></a>
+                        </li>
+                        <li class="icon-content">
+                            <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.329 10.333A8.01 8.01 0 0 0 7.99 16C12.414 16 16 12.418 16 8s-3.586-8-8.009-8A8.006 8.006 0 0 0 0 7.468l.003.006 4.304 1.769A2.2 2.2 0 0 1 5.62 8.88l1.96-2.844-.001-.04a3.046 3.046 0 0 1 3.042-3.043 3.046 3.046 0 0 1 3.042 3.043 3.047 3.047 0 0 1-3.111 3.044l-2.804 2a2.223 2.223 0 0 1-3.075 2.11 2.22 2.22 0 0 1-1.312-1.568L.33 10.333Z"></path><path d="M4.868 12.683a1.715 1.715 0 0 0 1.318-3.165 1.7 1.7 0 0 0-1.263-.02l1.023.424a1.261 1.261 0 1 1-.97 2.33l-.99-.41a1.7 1.7 0 0 0 .882.84Zm3.726-6.687a2.03 2.03 0 0 0 2.027 2.029 2.03 2.03 0 0 0 2.027-2.029 2.03 2.03 0 0 0-2.027-2.027 2.03 2.03 0 0 0-2.027 2.027m2.03-1.527a1.524 1.524 0 1 1-.002 3.048 1.524 1.524 0 0 1 .002-3.048"></path></svg></a>
+                        </li>
+                        <li class="icon-content">
+                            <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" fill="currentColor"></path></svg></a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modules = {};
+        let bindingModule = null;
+
+        const clickSound = new Audio("data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAACQB/8HkAewB/8HkAf/B5AHsAcAAAAA");
+
+        function playSound() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 600;
+            gain.gain.value = 0.05;
+            osc.start();
+            osc.stop(ctx.currentTime + 0.05);
+        }
+
+        function makeDraggable(el, handle) {
+            let p1=0, p2=0, p3=0, p4=0;
+            const target = handle || el;
+            target.onmousedown = function(e) {
+                if(e.target.closest('.controls') || e.target.closest('.toggle') || e.target.closest('.btn-load') || e.target.closest('.slider-wrap')) return;
+                if(e.button !== 0) return;
+                e.preventDefault();
+                p3 = e.clientX; p4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            };
+            function elementDrag(e) {
+                e.preventDefault();
+                p1 = p3 - e.clientX; p2 = p4 - e.clientY;
+                p3 = e.clientX; p4 = e.clientY;
+                el.style.top = (el.offsetTop - p2) + "px";
+                el.style.left = (el.offsetLeft - p1) + "px";
+            }
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+        
+        document.querySelectorAll('.draggable-hud').forEach(el => makeDraggable(el));
+        makeDraggable(document.getElementById('app'), document.getElementById('drag-handle'));
+
+        function login() {
+            const btn = document.querySelector('#auth-overlay .btn-primary');
+            btn.innerHTML = "Logging in...";
+            setTimeout(() => {
+                document.getElementById('auth-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('auth-overlay').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden-gui');
+                }, 500);
+            }, 800);
+        }
+
+        function tab(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function toggleCollapse(btn) {
+            btn.classList.toggle('open');
+            const content = btn.closest('.card').nextElementSibling;
+            if(content.classList.contains('collapsible')) {
+                content.classList.toggle('open');
+            }
+        }
+
+        function toggleModule(name, el) {
+            playSound();
+            el.classList.toggle('active');
+            const enabled = el.classList.contains('active');
+            
+            if(!modules[name]) modules[name] = { bind: null };
+            modules[name].enabled = enabled;
+
+            updateArrayList();
+            updateHotkeysList();
+        }
+
+        function updateArrayList() {
+            const list = document.getElementById('array-list');
+            list.innerHTML = '';
+            const activeMods = Object.keys(modules).filter(k => modules[k].enabled);
+            activeMods.sort((a, b) => b.length - a.length);
+            activeMods.forEach(mod => {
+                const div = document.createElement('div');
+                div.className = 'module-item';
+                div.innerText = mod;
+                div.style.color = '#fff';
+                list.appendChild(div);
+            });
+        }
+
+        function updateHotkeysList() {
+            const container = document.getElementById('hotkeys-container');
+            container.innerHTML = '';
+            Object.keys(modules).forEach(mod => {
+                if(modules[mod].enabled && modules[mod].bind) {
+                    const row = document.createElement('div');
+                    row.className = 'hotkey-row';
+                    row.innerHTML = `<span>${mod}</span><span style="color:var(--text-muted)">[${modules[mod].bind}]</span>`;
+                    container.appendChild(row);
+                }
+            });
+        }
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousedown', (e) => {
+                if(e.button === 1) { 
+                    e.preventDefault();
+                    const title = card.querySelector('.label-title');
+                    if(!title) return;
+                    
+                    const modName = title.firstChild.textContent.trim();
+                    const badge = card.querySelector('.bind-badge');
+                    
+                    bindingModule = modName;
+                    badge.classList.remove('hidden');
+                    badge.innerText = "[...]";
+                    badge.style.opacity = '1';
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if(bindingModule) {
+                e.preventDefault();
+                if(e.key === 'Escape') {
+                    if(modules[bindingModule]) modules[bindingModule].bind = null;
+                    const card = Array.from(document.querySelectorAll('.card')).find(c => c.querySelector('.label-title').textContent.includes(bindingModule));
+                    if(card) {
+                        const badge = card.querySelector('.bind-badge');
+                        badge.innerText = "";
+                        badge.style.opacity = '0';
+                    }
+                } else {
+                    const key = e.code.replace('Key', '');
+                    if(!modules[bindingModule]) modules[bindingModule] = { enabled: false };
+                    modules[bindingModule].bind = key;
+                    
+                    const card = Array.from(document.querySelectorAll('.card')).find(c => c.innerText.includes(bindingModule));
+                    if(card) {
+                        const badge = card.querySelector('.bind-badge');
+                        badge.innerText = `[${key}]`;
+                        badge.style.opacity = '1';
+                    }
+                }
+                bindingModule = null;
+                updateHotkeysList();
+                return;
+            }
+
+            if(e.code === 'ShiftRight') {
+                const app = document.getElementById('app');
+                if(app.classList.contains('hidden-gui')) app.classList.remove('hidden-gui');
+                else app.classList.add('hidden-gui');
+            }
+
+            Object.keys(modules).forEach(mod => {
+                if(modules[mod].bind === e.code.replace('Key', '')) {
+                    const card = Array.from(document.querySelectorAll('.card')).find(c => c.innerText.includes(mod));
+                    if(card) {
+                        const toggleBtn = card.querySelector('.toggle');
+                        toggleModule(mod, toggleBtn);
+                    }
+                }
+            });
+        });
+
+        function setTheme(theme, btn) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function loadConfig(btn) {
+            if(btn.classList.contains('loaded')) return;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Loading...";
+            setTimeout(() => {
+                btn.innerHTML = "Loaded";
+                setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            }, 600);
+        }
+
+        function startSlide(e, container, valId) {
+            e.stopPropagation();
+            const track = container.querySelector('.range-track');
+            const fill = container.querySelector('.range-fill');
+            const thumb = container.querySelector('.range-thumb');
+            const valSpan = document.getElementById(valId);
+            
+            function update(posX) {
+                const rect = track.getBoundingClientRect();
+                let percent = (posX - rect.left) / rect.width * 100;
+                percent = Math.max(0, Math.min(100, percent));
+                fill.style.width = percent + '%';
+                thumb.style.left = percent + '%';
+                if(valSpan) valSpan.innerText = (percent / 20).toFixed(1);
+            }
+            update(e.clientX);
+            
+            function onMove(moveE) { update(moveE.clientX); }
+            function onUp() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        }
+
+        setInterval(() => {
+            document.getElementById('fps').innerText = Math.floor(Math.random() * (300 - 100) + 100) + " FPS";
+            document.getElementById('bps').innerText = (Math.random() * 8).toFixed(1) + " BPS";
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour12: false });
+        }, 500);
+    </script>
+</body>
+</html>
