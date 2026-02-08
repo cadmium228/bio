@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lithium</title>
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -10,7 +10,7 @@
         @font-face { font-family: 'Benzin'; src: url('Benzin-Bold.ttf') format('truetype'); font-weight: bold; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { overflow: hidden; height: 100%; }
-        body { font-family: 'Inter', 'Google Sans', sans-serif; background: #000; color: #fff; height: 100vh; overflow: hidden; position: relative; }
+        body { font-family: 'Inter', 'Google Sans', sans-serif; background: #000; color: #fff; height: 100vh; overflow: hidden; position: relative; -webkit-tap-highlight-color: transparent; }
 
         .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
         .snowflakes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
@@ -166,8 +166,8 @@
         .stats-quote .quote-author { margin-top: 12px; font-size: 0.8rem; color: rgba(255,255,255,0.2); font-weight: 500; }
 
         .pong-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px; padding: 20px; }
-        .pong-container { border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); box-shadow: 0 0 40px rgba(74,0,224,0.1); }
-        .pong-canvas { display: block; }
+        .pong-container { border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); box-shadow: 0 0 40px rgba(74,0,224,0.1); max-width: 100%; }
+        .pong-canvas { display: block; max-width: 100%; height: auto; }
         .pong-score { font-family: 'Benzin', sans-serif; font-size: 1.2rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.6); text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         .pong-hint { font-size: 0.8rem; color: rgba(255,255,255,0.3); letter-spacing: 0.03em; }
 
@@ -177,7 +177,7 @@
         .feed-compose-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .feed-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4a00e0, #00d4ff); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
         .feed-username { font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.7); }
-        .feed-textarea { width: 100%; min-height: 60px; max-height: 150px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: vertical; outline: none; transition: border-color 0.3s ease; }
+        .feed-textarea { width: 100%; min-height: 60px; max-height: 150px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; color: #fff; font-family: 'Inter', sans-serif; font-size: 16px; resize: vertical; outline: none; transition: border-color 0.3s ease; }
         .feed-textarea::placeholder { color: rgba(255,255,255,0.25); }
         .feed-textarea:focus { border-color: rgba(255,255,255,0.2); }
         .feed-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
@@ -213,22 +213,142 @@
 
         .no-results { text-align: center; color: rgba(255,255,255,0.3); font-size: 1rem; padding: 40px 20px; display: none; }
 
-        @media (max-width: 900px) { .floating-img-left, .floating-img-right { display: none; } }
-        @media (max-width: 600px) {
-            .player { flex-direction: column; text-align: center; margin-top: 25px; max-width: calc(100% - 40px); }
-            .player-cover { width: 160px; height: 160px; }
-            .title-wrapper { min-width: 200px; }
-            .top-icons { top: 15px; right: 15px; gap: 10px; }
-            .top-icon { height: 32px; } .top-icon-svg { width: 32px; height: 32px; }
-            .tabs-nav { flex-wrap: wrap; justify-content: center; margin: 15px 10px 0; }
-            .tab-btn { padding: 7px 10px; font-size: 0.7rem; gap: 4px; }
-            .tab-btn svg { width: 14px; height: 14px; }
-            .project-card { width: 100%; }
-            .stats-grid { grid-template-columns: 1fr 1fr; padding: 0 10px; }
-            .clock-display { display: none; } .konami-hint { display: none; }
-            .toast-container { right: 10px; left: 10px; }
-            .toast { font-size: 0.8rem; white-space: normal; }
-            .main-page-inner { margin-top: -20px; }
+        @media (max-width: 900px) {
+            .floating-img-left, .floating-img-right { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .tabs-nav { flex-wrap: wrap; justify-content: center; margin: 12px 8px 0; max-width: calc(100% - 16px); border-radius: 12px; gap: 2px; padding: 3px; }
+            .tab-btn { padding: 8px 12px; font-size: 0.75rem; gap: 5px; border-radius: 8px; }
+            .tab-btn svg { width: 15px; height: 15px; }
+            .tab-btn span { display: none; }
+
+            .tabs-content { height: calc(100vh - 100px); }
+
+            .main-page-inner { margin-top: -30px; padding: 0 16px; }
+
+            .title { font-size: clamp(2.2rem, 12vw, 3.5rem); letter-spacing: 0.1em; }
+            .title-wrapper { min-width: 180px; }
+
+            .telegram-btn { margin-top: 40px; padding: 12px 22px; font-size: 0.9rem; gap: 10px; }
+            .telegram-btn svg { width: 20px; height: 20px; }
+
+            .player { flex-direction: column; text-align: center; margin-top: 25px; max-width: calc(100% - 20px); padding: 16px; gap: 16px; border-radius: 16px; }
+            .player-cover { width: 100px; height: 100px; border-radius: 10px; }
+            .track-name { font-size: 0.95rem; white-space: normal; overflow: hidden; text-overflow: ellipsis; }
+            .track-author { font-size: 0.8rem; }
+            .control-buttons { gap: 8px; }
+            .control-btn { width: 36px; height: 36px; }
+            .control-btn svg { width: 18px; height: 18px; }
+            .play-btn { width: 44px; height: 44px; }
+            .play-btn svg { width: 20px; height: 20px; }
+
+            .inner-scroll { padding: 20px 14px 90px; }
+
+            .page-title { font-size: clamp(1.5rem, 7vw, 2.5rem); margin-bottom: 20px; letter-spacing: 0.08em; }
+
+            .search-filter-bar { gap: 8px; margin-bottom: 20px; }
+            .search-input { min-width: 150px; padding: 9px 14px; font-size: 0.85rem; border-radius: 10px; }
+            .filter-btn { padding: 9px 14px; font-size: 0.75rem; border-radius: 10px; }
+
+            .projects-grid { gap: 16px; }
+            .project-card { width: 100%; padding: 20px; border-radius: 18px; }
+            .project-name { font-size: 1.3rem; }
+            .project-description { font-size: 0.85rem; margin-bottom: 14px; }
+            .project-screenshot { border-radius: 12px; margin-bottom: 16px; }
+            .project-footer { gap: 10px; }
+            .project-link { padding: 9px 18px; font-size: 0.85rem; border-radius: 10px; }
+            .lang-badge { padding: 5px 12px; font-size: 0.7rem; }
+            .lang-badge svg, .lang-badge img { width: 14px; height: 14px; }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 4px; }
+            .stat-card { padding: 20px 16px; border-radius: 16px; }
+            .stat-icon { width: 28px; height: 28px; margin-bottom: 10px; }
+            .stat-value { font-size: 1.5rem; }
+            .stat-label { font-size: 0.7rem; }
+
+            .stats-quote p { font-size: 0.9rem; }
+            .stats-quote .quote-author { font-size: 0.7rem; }
+
+            .pong-page { gap: 12px; padding: 10px; }
+            .pong-score { font-size: 1rem; }
+            .pong-hint { font-size: 0.7rem; }
+            .pong-container { border-radius: 12px; }
+
+            .feed-compose { padding: 16px; border-radius: 16px; }
+            .feed-textarea { min-height: 50px; padding: 10px 14px; }
+            .feed-post { padding: 14px 16px; border-radius: 14px; }
+            .feed-post-text { font-size: 0.85rem; }
+
+            .overlay-text { font-size: 1.2rem; letter-spacing: 0.2em; }
+
+            .marquee { padding: 12px 0; }
+            .marquee-content { font-size: 0.8rem; }
+
+            .top-icons { top: 12px; right: 12px; gap: 8px; }
+            .top-icon { height: 30px; border-radius: 8px; }
+            .top-icon-svg { width: 30px; height: 30px; }
+
+            .clock-display { display: none; }
+            .konami-hint { display: none; }
+            .secret-btn { bottom: 50px; font-size: 0.55rem; }
+
+            .toast-container { right: 10px; left: 10px; top: 55px; }
+            .toast { font-size: 0.75rem; white-space: normal; padding: 10px 16px; border-radius: 10px; }
+
+            .glow-orb { width: 250px; height: 250px; }
+        }
+
+        @media (max-width: 400px) {
+            .tabs-nav { margin: 8px 6px 0; padding: 2px; gap: 1px; }
+            .tab-btn { padding: 6px 8px; font-size: 0.65rem; gap: 3px; }
+            .tab-btn svg { width: 13px; height: 13px; }
+
+            .main-page-inner { margin-top: -20px; padding: 0 12px; }
+
+            .title { font-size: clamp(1.8rem, 14vw, 2.8rem); }
+
+            .telegram-btn { margin-top: 30px; padding: 10px 18px; font-size: 0.8rem; }
+
+            .player { padding: 14px; gap: 12px; max-width: calc(100% - 16px); }
+            .player-cover { width: 80px; height: 80px; }
+            .track-name { font-size: 0.85rem; }
+            .track-author { font-size: 0.75rem; }
+
+            .inner-scroll { padding: 16px 10px 90px; }
+
+            .page-title { font-size: clamp(1.3rem, 8vw, 2rem); margin-bottom: 16px; }
+
+            .project-card { padding: 16px; border-radius: 14px; }
+            .project-name { font-size: 1.1rem; }
+            .project-description { font-size: 0.8rem; }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat-card { padding: 16px 12px; border-radius: 14px; }
+            .stat-value { font-size: 1.3rem; }
+
+            .feed-compose { padding: 12px; border-radius: 14px; }
+            .feed-post { padding: 12px 14px; border-radius: 12px; }
+
+            .top-icons { top: 8px; right: 8px; gap: 6px; }
+            .top-icon { height: 26px; }
+            .top-icon-svg { width: 26px; height: 26px; }
+        }
+
+        @media (max-height: 700px) and (max-width: 768px) {
+            .main-page-inner { margin-top: -10px; }
+            .telegram-btn { margin-top: 20px; padding: 10px 18px; font-size: 0.85rem; }
+            .player { margin-top: 15px; padding: 12px; gap: 12px; }
+            .player-cover { width: 70px; height: 70px; }
+            .track-name { font-size: 0.85rem; }
+            .control-btn { width: 32px; height: 32px; }
+            .play-btn { width: 38px; height: 38px; }
+        }
+
+        @media (hover: none) {
+            .project-card:hover { box-shadow: none; }
+            .player:hover { box-shadow: none; }
+            .stat-card:hover { box-shadow: none; }
         }
     </style>
 </head>
@@ -250,12 +370,12 @@
 
     <div class="content" id="content">
         <nav class="tabs-nav" id="tabsNav">
-            <button class="tab-btn active" data-tab="main"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Main</button>
-            <button class="tab-btn" data-tab="projects"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H6v-2h8v2zm4-4H6v-2h12v2z"/></svg>Projects</button>
-            <button class="tab-btn" data-tab="configs"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>Configs</button>
-            <button class="tab-btn" data-tab="feed"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>Feed</button>
-            <button class="tab-btn" data-tab="pong"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Pong</button>
-            <button class="tab-btn" data-tab="stats"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Stats</button>
+            <button class="tab-btn active" data-tab="main"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Main</span></button>
+            <button class="tab-btn" data-tab="projects"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H6v-2h8v2zm4-4H6v-2h12v2z"/></svg><span>Projects</span></button>
+            <button class="tab-btn" data-tab="configs"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span>Configs</span></button>
+            <button class="tab-btn" data-tab="feed"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>Feed</span></button>
+            <button class="tab-btn" data-tab="pong"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>Pong</span></button>
+            <button class="tab-btn" data-tab="stats"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>Stats</span></button>
         </nav>
         <div class="tabs-content">
             <div class="tab-page active" id="tab-main">
@@ -284,7 +404,7 @@
             <div class="tab-page" id="tab-projects"><div class="inner-scroll"><h2 class="page-title reveal">Projects</h2><div class="search-filter-bar reveal"><input type="text" class="search-input" id="searchProjects" placeholder="Search projects..."><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="html">HTML</button><button class="filter-btn" data-filter="js">JS</button></div><div class="projects-grid" id="projectsGrid"><div class="project-card reveal" data-tilt data-tags="html js"><div class="project-name">LithiumChat</div><div class="project-description">Chat with AI, created on the basis of puter.js. The service is paid, but free models such as GPT-4o are available. You can purchase a subscription on the puter.com website.</div><img src="lithiumchat.png" alt="LithiumChat" class="project-screenshot"><div class="project-footer"><a href="https://cadmium228.github.io/LithiumChat/" target="_blank" rel="noopener" class="project-link"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>Open</a><div class="project-langs"><span class="lang-badge html"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M1.5 0h21l-1.91 21.56L11.99 24l-8.59-2.44L1.5 0zm7.09 9.87L8.35 7.42h8.16l.24-2.56H5.81l.71 7.96h7.85l-.34 3.54-2.53.69-2.53-.69-.16-1.79H6.25l.32 3.54 5.44 1.5 5.43-1.5.69-7.74H8.59z"/></svg>HTML</span><span class="lang-badge js"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.405-.6-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z"/></svg>JS</span></div></div></div></div><div class="no-results" id="noResults">No projects found</div></div></div>
             <div class="tab-page" id="tab-configs"><div class="inner-scroll"><h2 class="page-title reveal">Configs</h2><div class="search-filter-bar reveal"><input type="text" class="search-input" id="searchConfigs" placeholder="Search configs..."></div><div class="projects-grid" id="configsGrid"><div class="project-card reveal" data-tilt data-tags="rw"><div class="project-name">Catlavan</div><img src="catlavan.png" alt="Catlavan" class="project-screenshot"><div class="project-footer"><button class="project-link" id="downloadCatlavan"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Download</button><div class="project-langs"><span class="lang-badge rw"><img src="rw.svg" alt="RW" width="16" height="16">RW</span></div></div></div></div><div class="no-results" id="noResultsConfigs">No configs found</div></div></div>
             <div class="tab-page" id="tab-feed"><div class="inner-scroll"><h2 class="page-title reveal">Feed</h2><div class="feed-compose reveal"><div class="feed-compose-header"><div class="feed-avatar">A</div><div class="feed-username">Anon</div></div><textarea class="feed-textarea" id="feedInput" placeholder="Leave your mark..." maxlength="280"></textarea><div class="feed-actions"><span class="feed-char-count" id="feedCharCount">0 / 280</span><button class="feed-send-btn" id="feedSendBtn" disabled>Post</button></div></div><div class="feed-posts" id="feedPosts"><div class="feed-loading" id="feedLoading">Loading posts...</div></div></div></div>
-            <div class="tab-page" id="tab-pong"><div class="pong-page"><h2 class="page-title reveal">Pong</h2><div class="pong-score reveal" id="pongScore">0 : 0</div><div class="pong-container reveal"><canvas class="pong-canvas" id="pongCanvas" width="600" height="360"></canvas></div><div class="pong-hint reveal">Use ↑ ↓ or mouse to move your paddle</div></div></div>
+            <div class="tab-page" id="tab-pong"><div class="pong-page"><h2 class="page-title reveal">Pong</h2><div class="pong-score reveal" id="pongScore">0 : 0</div><div class="pong-container reveal"><canvas class="pong-canvas" id="pongCanvas" width="600" height="360"></canvas></div><div class="pong-hint reveal">Use ↑ ↓ or touch to move your paddle</div></div></div>
             <div class="tab-page" id="tab-stats"><div class="inner-scroll"><h2 class="page-title reveal">Stats</h2><div class="stats-grid"><div class="stat-card reveal" data-tilt><svg class="stat-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H6v-2h8v2zm4-4H6v-2h12v2z"/></svg><div class="stat-value" id="statProjects">0</div><div class="stat-label">Projects</div></div><div class="stat-card reveal" data-tilt><svg class="stat-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><div class="stat-value" id="statConfigs">0</div><div class="stat-label">Configs</div></div><div class="stat-card reveal" data-tilt><svg class="stat-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><div class="stat-value" id="statTracks">0</div><div class="stat-label">Tracks</div></div><div class="stat-card reveal" data-tilt><svg class="stat-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg><div class="stat-value">∞</div><div class="stat-label">Vibes</div></div></div><div class="stats-quote reveal"><p>The best code is the code that was never written.</p><div class="quote-author">— Someone on the internet</div></div></div></div>
         </div>
     </div>
@@ -298,12 +418,13 @@
         var audioCtxUI=null;
         function playUISound(type){try{if(!audioCtxUI)audioCtxUI=new(window.AudioContext||window.webkitAudioContext)();var osc=audioCtxUI.createOscillator();var gain=audioCtxUI.createGain();osc.connect(gain);gain.connect(audioCtxUI.destination);if(type==='click'){osc.type='sine';osc.frequency.setValueAtTime(900,audioCtxUI.currentTime);osc.frequency.exponentialRampToValueAtTime(600,audioCtxUI.currentTime+0.06);gain.gain.setValueAtTime(0.08,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.08);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.08)}else if(type==='hover'){osc.type='sine';osc.frequency.setValueAtTime(1400,audioCtxUI.currentTime);gain.gain.setValueAtTime(0.02,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.04);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.04)}else if(type==='tab'){osc.type='sine';osc.frequency.setValueAtTime(500,audioCtxUI.currentTime);osc.frequency.exponentialRampToValueAtTime(800,audioCtxUI.currentTime+0.1);gain.gain.setValueAtTime(0.07,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.15);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.15)}else if(type==='score'){osc.type='triangle';osc.frequency.setValueAtTime(523,audioCtxUI.currentTime);osc.frequency.setValueAtTime(659,audioCtxUI.currentTime+0.08);osc.frequency.setValueAtTime(784,audioCtxUI.currentTime+0.16);gain.gain.setValueAtTime(0.1,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.3);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.3)}else if(type==='hit'){osc.type='square';osc.frequency.setValueAtTime(400,audioCtxUI.currentTime);osc.frequency.exponentialRampToValueAtTime(200,audioCtxUI.currentTime+0.05);gain.gain.setValueAtTime(0.05,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.06);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.06)}else if(type==='wall'){osc.type='sine';osc.frequency.setValueAtTime(250,audioCtxUI.currentTime);gain.gain.setValueAtTime(0.04,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.05);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.05)}else if(type==='open'){osc.type='sine';osc.frequency.setValueAtTime(400,audioCtxUI.currentTime);osc.frequency.exponentialRampToValueAtTime(1000,audioCtxUI.currentTime+0.15);gain.gain.setValueAtTime(0.06,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.2);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.2)}else if(type==='send'){osc.type='sine';osc.frequency.setValueAtTime(600,audioCtxUI.currentTime);osc.frequency.exponentialRampToValueAtTime(1200,audioCtxUI.currentTime+0.1);gain.gain.setValueAtTime(0.08,audioCtxUI.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,audioCtxUI.currentTime+0.15);osc.start(audioCtxUI.currentTime);osc.stop(audioCtxUI.currentTime+0.15)}}catch(e){}}
 
+        var isMobile=window.innerWidth<=768;
         var tracks=[{file:"track.mp3",cover:"track.png",title:"ex-freundin",author:"luu, Nosgov"},{file:"track2.mp3",cover:"track2.png",title:"L'Amour Toujours (Organ Penguin Version)",author:"Deprezz, Lewis Hanton, Agartha, Orchestral Club"}];
         var currentTrack=0,overlay=document.getElementById('overlay'),header=document.getElementById('header'),player=document.getElementById('player'),audio=document.getElementById('audio'),titleEl=document.getElementById('title'),titleTextEl=document.getElementById('titleText'),playBtn=document.getElementById('playBtn'),playIcon=document.getElementById('playIcon'),progressContainer=document.getElementById('progressContainer'),progress=document.getElementById('progress'),currentTimeEl=document.getElementById('currentTime'),durationEl=document.getElementById('duration'),playerCover=document.getElementById('playerCover'),trackNameEl=document.getElementById('trackName'),trackAuthorEl=document.getElementById('trackAuthor'),prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn'),snowflakesContainer=document.getElementById('snowflakes'),tabsNav=document.getElementById('tabsNav'),konamiOverlay=document.getElementById('konamiOverlay'),konamiHint=document.getElementById('konamiHint'),clockDisplay=document.getElementById('clockDisplay'),toastContainer=document.getElementById('toastContainer');
         var titleText='Lithium',charIndex=0,typewriterActive=false,currentText='';
         var playerInitialized=false;
 
-        function createSnowflakes(){for(var i=0;i<50;i++){var s=document.createElement('div');s.className='snowflake';s.style.left=Math.random()*100+'%';var sz=(Math.random()*6+2)+'px';s.style.width=sz;s.style.height=sz;s.style.animationDuration=(Math.random()*5+5)+'s';s.style.animationDelay=(Math.random()*10)+'s';s.style.opacity=Math.random()*0.6+0.2;snowflakesContainer.appendChild(s)}}createSnowflakes();
+        function createSnowflakes(){var count=isMobile?20:50;for(var i=0;i<count;i++){var s=document.createElement('div');s.className='snowflake';s.style.left=Math.random()*100+'%';var sz=(Math.random()*6+2)+'px';s.style.width=sz;s.style.height=sz;s.style.animationDuration=(Math.random()*5+5)+'s';s.style.animationDelay=(Math.random()*10)+'s';s.style.opacity=Math.random()*0.6+0.2;snowflakesContainer.appendChild(s)}}createSnowflakes();
 
         function updateClock(){var n=new Date();document.getElementById('clockTime').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');var d=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('clockDate').textContent=d[n.getDay()]+', '+m[n.getMonth()]+' '+n.getDate()}setInterval(updateClock,1000);updateClock();
 
@@ -337,10 +458,7 @@
 
         function getEvaporatableElements(page){
             var items=[];
-            if(page.id==='tab-main'){
-                items.push(header);
-                items.push(player);
-            }
+            if(page.id==='tab-main'){items.push(header);items.push(player)}
             var els=page.querySelectorAll('.reveal, .revealed');
             els.forEach(function(el){items.push(el)});
             return items;
@@ -349,139 +467,48 @@
         function evaporateElements(page,callback){
             var items=getEvaporatableElements(page);
             if(items.length===0){callback();return}
-            items.forEach(function(el,i){
-                setTimeout(function(){
-                    el.classList.add('evaporate');
-                },i*60);
-            });
+            items.forEach(function(el,i){setTimeout(function(){el.classList.add('evaporate')},i*60)});
             setTimeout(callback,items.length*60+400);
         }
 
         function cleanupAfterEvaporate(page){
             var items=getEvaporatableElements(page);
-            items.forEach(function(el){
-                el.classList.remove('evaporate');
-            });
+            items.forEach(function(el){el.classList.remove('evaporate')});
             var allRevealable=page.querySelectorAll('.revealed');
-            allRevealable.forEach(function(el){
-                el.classList.remove('revealed');
-                el.classList.add('reveal');
-            });
-            if(page.id==='tab-main'){
-                header.classList.remove('visible');
-                player.classList.remove('visible');
-            }
+            allRevealable.forEach(function(el){el.classList.remove('revealed');el.classList.add('reveal')});
+            if(page.id==='tab-main'){header.classList.remove('visible');player.classList.remove('visible')}
         }
 
         function revealElements(page){
             var els=page.querySelectorAll('.reveal, .revealed');
-            els.forEach(function(el){
-                el.classList.remove('visible','revealed','evaporate');
-                el.classList.add('reveal');
-                el.style.transition='none';
-                el.offsetHeight;
-                el.style.transition='';
-            });
-            els.forEach(function(el,i){
-                setTimeout(function(){
-                    el.classList.add('visible');
-                    setTimeout(function(){
-                        el.classList.remove('reveal','visible');
-                        el.classList.add('revealed');
-                    },900);
-                },200+i*150);
-            });
+            els.forEach(function(el){el.classList.remove('visible','revealed','evaporate');el.classList.add('reveal');el.style.transition='none';el.offsetHeight;el.style.transition=''});
+            els.forEach(function(el,i){setTimeout(function(){el.classList.add('visible');setTimeout(function(){el.classList.remove('reveal','visible');el.classList.add('revealed')},900)},200+i*150)});
             if(page.id==='tab-main'&&playerInitialized){
-                header.classList.remove('visible','evaporate');
-                header.style.transition='none';
-                header.style.opacity='0';
-                header.style.transform='translateY(30px)';
-                header.style.filter='blur(6px)';
-                header.offsetHeight;
-                header.style.transition='';
-                setTimeout(function(){
-                    header.style.transition='opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1), filter 0.8s cubic-bezier(0.4,0,0.2,1)';
-                    header.style.opacity='1';
-                    header.style.transform='translateY(0)';
-                    header.style.filter='blur(0px)';
-                    setTimeout(function(){
-                        header.style.transition='';
-                        header.style.opacity='';
-                        header.style.transform='';
-                        header.style.filter='';
-                        header.classList.add('visible');
-                    },900);
-                },100);
-
-                player.classList.remove('visible','evaporate');
-                player.style.transition='none';
-                player.style.opacity='0';
-                player.style.transform='translateY(30px)';
-                player.style.filter='blur(6px)';
-                player.offsetHeight;
-                player.style.transition='';
-                setTimeout(function(){
-                    player.style.transition='opacity 1s cubic-bezier(0.4,0,0.2,1), transform 1s cubic-bezier(0.4,0,0.2,1), filter 1s cubic-bezier(0.4,0,0.2,1)';
-                    player.style.opacity='1';
-                    player.style.transform='translateY(0)';
-                    player.style.filter='blur(0px)';
-                    setTimeout(function(){
-                        player.style.transition='';
-                        player.style.opacity='';
-                        player.style.transform='';
-                        player.style.filter='';
-                        player.classList.add('visible');
-                    },1100);
-                },300);
+                header.classList.remove('visible','evaporate');header.style.transition='none';header.style.opacity='0';header.style.transform='translateY(30px)';header.style.filter='blur(6px)';header.offsetHeight;header.style.transition='';
+                setTimeout(function(){header.style.transition='opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1), filter 0.8s cubic-bezier(0.4,0,0.2,1)';header.style.opacity='1';header.style.transform='translateY(0)';header.style.filter='blur(0px)';setTimeout(function(){header.style.transition='';header.style.opacity='';header.style.transform='';header.style.filter='';header.classList.add('visible')},900)},100);
+                player.classList.remove('visible','evaporate');player.style.transition='none';player.style.opacity='0';player.style.transform='translateY(30px)';player.style.filter='blur(6px)';player.offsetHeight;player.style.transition='';
+                setTimeout(function(){player.style.transition='opacity 1s cubic-bezier(0.4,0,0.2,1), transform 1s cubic-bezier(0.4,0,0.2,1), filter 1s cubic-bezier(0.4,0,0.2,1)';player.style.opacity='1';player.style.transform='translateY(0)';player.style.filter='blur(0px)';setTimeout(function(){player.style.transition='';player.style.opacity='';player.style.transform='';player.style.filter='';player.classList.add('visible')},1100)},300);
             }
         }
 
         tabButtons.forEach(function(btn){
             btn.addEventListener('mouseenter',function(){playUISound('hover')});
             btn.addEventListener('click',function(){
-                var targetTab=btn.getAttribute('data-tab');
-                if(targetTab===currentTabId||switching)return;
-                switching=true;
-                playUISound('tab');
-                tabButtons.forEach(function(b){b.classList.remove('active')});
-                btn.classList.add('active');
-                var cp=document.getElementById('tab-'+currentTabId);
-                var tp=document.getElementById('tab-'+targetTab);
+                var targetTab=btn.getAttribute('data-tab');if(targetTab===currentTabId||switching)return;switching=true;playUISound('tab');
+                tabButtons.forEach(function(b){b.classList.remove('active')});btn.classList.add('active');
+                var cp=document.getElementById('tab-'+currentTabId),tp=document.getElementById('tab-'+targetTab);
                 if(currentTabId==='pong')pongRunning=false;
-                evaporateElements(cp,function(){
-                    cp.classList.add('fade-out');
-                    setTimeout(function(){
-                        cp.classList.remove('active','fade-out');
-                        cleanupAfterEvaporate(cp);
-                        tp.classList.add('active');
-                        revealElements(tp);
-                        currentTabId=targetTab;
-                        switching=false;
-                        if(targetTab==='pong')startPong();
-                        if(targetTab==='feed')loadFeed();
-                    },200);
-                });
+                evaporateElements(cp,function(){cp.classList.add('fade-out');setTimeout(function(){cp.classList.remove('active','fade-out');cleanupAfterEvaporate(cp);tp.classList.add('active');revealElements(tp);currentTabId=targetTab;switching=false;if(targetTab==='pong')startPong();if(targetTab==='feed')loadFeed()},200)});
             })
         });
 
         document.querySelectorAll('.project-link,.filter-btn,.telegram-btn,.control-btn,.play-btn,.secret-btn,.top-icon,.top-icon-svg,.lang-badge').forEach(function(el){if(!el.dataset.sb){el.dataset.sb='1';el.addEventListener('mouseenter',function(){playUISound('hover')});el.addEventListener('click',function(){playUISound('click')})}});
 
         function setupTilt(el){
-            el.addEventListener('mousemove',function(e){
-                var r=el.getBoundingClientRect();
-                var centerX=r.left+r.width/2;
-                var centerY=r.top+r.height/2;
-                var mouseX=e.clientX-centerX;
-                var mouseY=e.clientY-centerY;
-                var rotateY=-(mouseX/(r.width/2))*6;
-                var rotateX=(mouseY/(r.height/2))*6;
-                el.style.transform='perspective(800px) rotateX('+rotateX+'deg) rotateY('+rotateY+'deg) scale3d(1.01,1.01,1.01)';
-            });
-            el.addEventListener('mouseleave',function(){
-                el.style.transform='perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
-            });
+            if(isMobile)return;
+            el.addEventListener('mousemove',function(e){var r=el.getBoundingClientRect();var centerX=r.left+r.width/2;var centerY=r.top+r.height/2;var mouseX=e.clientX-centerX;var mouseY=e.clientY-centerY;var rotateY=-(mouseX/(r.width/2))*6;var rotateX=(mouseY/(r.height/2))*6;el.style.transform='perspective(800px) rotateX('+rotateX+'deg) rotateY('+rotateY+'deg) scale3d(1.01,1.01,1.01)'});
+            el.addEventListener('mouseleave',function(){el.style.transform='perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)'});
         }
-
         document.querySelectorAll('[data-tilt]').forEach(function(el){setupTilt(el)});
         setupTilt(player);
 
@@ -508,7 +535,20 @@
 
         var pongCanvas=document.getElementById('pongCanvas'),pCtx=pongCanvas.getContext('2d'),pW=600,pH=360,paddleH=80,paddleW=10,ballR=6;
         var pongPlayerY=pH/2-paddleH/2,pongAIY=pH/2-paddleH/2,ballX=pW/2,ballY=pH/2,ballVX=2,ballVY=1.5,pongPlayerDir=0,pongScoreP=0,pongScoreAI=0,pongRunning=false,pongMouseY=pH/2,aiMissing=false,aiMissOffset=0;
+
+        function resizePongCanvas(){
+            var container=pongCanvas.parentElement;
+            var maxW=Math.min(600,window.innerWidth-40);
+            var ratio=360/600;
+            pongCanvas.style.width=maxW+'px';
+            pongCanvas.style.height=(maxW*ratio)+'px';
+        }
+        resizePongCanvas();
+        window.addEventListener('resize',function(){isMobile=window.innerWidth<=768;resizePongCanvas()});
+
         pongCanvas.addEventListener('mousemove',function(e){var r=pongCanvas.getBoundingClientRect();pongMouseY=((e.clientY-r.top)/r.height)*pH});
+        pongCanvas.addEventListener('touchmove',function(e){e.preventDefault();var r=pongCanvas.getBoundingClientRect();var touch=e.touches[0];pongMouseY=((touch.clientY-r.top)/r.height)*pH},{passive:false});
+        pongCanvas.addEventListener('touchstart',function(e){var r=pongCanvas.getBoundingClientRect();var touch=e.touches[0];pongMouseY=((touch.clientY-r.top)/r.height)*pH},{passive:true});
 
         function resetBall(){ballX=pW/2;ballY=pH/2;ballVX=(Math.random()>0.5?2:-2);ballVY=(Math.random()-0.5)*3;aiMissing=Math.random()<0.2;aiMissOffset=aiMissing?(Math.random()>0.5?1:-1)*(paddleH+Math.random()*60):0}
 
